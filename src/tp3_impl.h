@@ -15,39 +15,63 @@ using namespace std;
 template <typename iterator, typename bucket>
 vector<bucket> generar_buckets(iterator input_begin, iterator input_end) {
 
-	// Busco el máximo en la colección y la longitud de la colección.
-	// En base a estas dos cosas calculo la cantidad de buckets. 
+	if(input_begin == input_end){
+		return vector<bucket>();
+	}
+
 	int max = int(*input_begin); 
+	int min = int(*input_begin); 	
 	int lenght = 0; 
-	auto it = input_begin;
-	for(it; it != input_end; it++){
+	for(auto it = input_begin; it != input_end; it++){
 		if(max <= int(*it)){ max = int(*it);}
+		if(min >= int(*it)){ min = int(*it);}
 		lenght++;
 	}
+	vector<bucket> buckets((max-min)+1);
 
-	int cantBuckets = ( lenght != 0) ? max / lenght : 0;
-
-	vector<bucket> buckets(cantBuckets+1);
-
-	it = input_begin;
-	for(it; it != input_end; it++){
-		int bucketIndex = ( cantBuckets != 0) ? abs(int(*it)) % cantBuckets : 0; 
+	for(auto it = input_begin; it != input_end; it++){
+		int bucketIndex = int(*it)-min;
 		buckets[bucketIndex].insert(buckets[bucketIndex].end(), (*it));
-	}	
-
-	for(int i = 0; i < cantBuckets; i++){
-		buckets[i].sort();
 	}
 
+	for(int i = 0; i < buckets.size(); i++){
+
+		for(auto it = buckets[i].begin(); it != buckets[i].end(); it++){
+			for(auto it2 = it; it2 != buckets[i].end(); it2++){
+				if(*it > *it2){
+					std::swap(it, it2);
+				}
+			}
+		}
+	}
 	return buckets;
 }
 
-/*
+
 template <typename bucket>
 vector<typename bucket::value_type> aplanar_buckets(const std::vector<bucket> & B) {
-    return vector<typename bucket::value_type>();
+
+	int firstBucketSize = 0; 
+
+	for(int i = 0; i < B.size(); i++){
+		if(B[i].size() > 0){
+			int firstBucketSize = B[1].size();
+			break;
+		}
+	}
+
+	vector<typename bucket::value_type> res(firstBucketSize);
+
+	for(int i = 0; i < B.size(); i++){
+		if(B[i].size() > 0){
+			res.insert(res.end(), B[i].begin(), B[i].end());
+		}
+	}
+	
+    return res;
 }
 
+/*
 ///////////////////////////////////////////////////////////////////////////////
 /// EJERCICIO 2
 ////

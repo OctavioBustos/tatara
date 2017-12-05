@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include "../src/tp3.h"
-
-#include <chrono>
+#include "timing.h"
 #include <iostream>
 
 TEST(test_multiplicacion, test_matriz_cuadrada) {
@@ -30,20 +29,21 @@ TEST(test_multiplicacion, test_matriz_cuadrada) {
                   ));
 }
 
+#ifdef TEST_TIMING
+
 TEST(test_multiplicacion, test_matriz_gigante) {
+    size_t T0, T1;
     // una matriz un poco más grande
-    Matriz M4 = crear(1024,1.0);
-    auto t0 = std::chrono::system_clock::now();
-    Matriz M5 = multiplicar_strassen(M4, M4, 32);
-    auto t1 = std::chrono::system_clock::now();
+    Matriz M4 = crear(1024,1.0), M5, M6;
+    TIME(M5 = multiplicar_strassen(M4, M4, 32), RUN_TIMES, T0);
     EXPECT_FLOAT_EQ(M5[0][0], M5.size());
 
-    auto t2 = std::chrono::system_clock::now();
-    Matriz M6 = multiplicar_strassen(M4, M4, M4.size());
-    auto t3 = std::chrono::system_clock::now();
+    TIME(M6 = multiplicar(M4, M4), RUN_TIMES, T1);
     EXPECT_FLOAT_EQ(M5[0][0], M5.size());
-    auto d = double((t1-t0).count()) / (t3-t2).count();
+    auto d = double(T0)/T1;
+    std::cout << "T0: " << T0 << std::endl;
+    std::cout << "T1: " << T1 << std::endl;
     std::cout << "D: " << d << std::endl;
     EXPECT_LT(d, 0.4);
 }
-
+#endif

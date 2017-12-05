@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "../src/tp3.h"
-#include <chrono>
+#include "timing.h"
 #include <random>
 
 fajo ordenar_billetes_naif(const fajo & falsos, const fajo & a_ordenar) {
@@ -64,8 +64,12 @@ TEST(ordenar_billetes, test_basico) {
 
 }
 
+#ifdef TEST_TIMING
+
 TEST(ordenar_billetes, test_billetera_grande) {
     fajo todos, falsos;
+    fajo res, res2;
+    size_t T0, T1;
     todos.reserve(26*100000);
     int count_falsos = 0;
 
@@ -89,24 +93,19 @@ TEST(ordenar_billetes, test_billetera_grande) {
             }
         }
     }
-    auto t0 = std::chrono::system_clock::now();
-    fajo res = ordenar_por_probabilidad(falsos, todos);
-    auto t1 = std::chrono::system_clock::now();
+    TIME(res = ordenar_por_probabilidad(falsos, todos), RUN_TIMES,T0);
 
     EXPECT_EQ(res.front(), billete(199991996));
     EXPECT_EQ(res[count_falsos-1].probabilidad_falso, probabilidad_max);
     EXPECT_LE(res[count_falsos].probabilidad_falso, probabilidad_max);
     EXPECT_EQ(res[res.size()/2], billete(168912003));
     EXPECT_EQ(res.back(), billete(100002016));
+    std::cout << "T0: " << T0 << std::endl;
 
-    std::cout << "T0: " << (t1-t0).count() << std::endl;
+    TIME(res2 = ordenar_billetes_naif(falsos, todos), RUN_TIMES ,T1);
+    std::cout << "T1: " << T1 << std::endl;
 
-    auto t2 = std::chrono::system_clock::now();
-    auto res2 = ordenar_billetes_naif(falsos, todos);
-    auto t3 = std::chrono::system_clock::now();
-
-    std::cout << "T1: " << (t3-t2).count() << std::endl;
-    auto d = double((t1-t0).count()) / (t3-t2).count();
+    auto d = double(T0) / T1;
     std::cout << "T0/T1: " << d << std::endl;
 
     EXPECT_EQ(res, res2);
@@ -115,6 +114,8 @@ TEST(ordenar_billetes, test_billetera_grande) {
 
 TEST(ordenar_billetes, test_pocos_anios_muchos_falsos) {
     fajo todos, falsos;
+    fajo res, res2;
+    size_t T0, T1;
     todos.reserve(10000);
     int count_falsos = 0;
 
@@ -139,9 +140,7 @@ TEST(ordenar_billetes, test_pocos_anios_muchos_falsos) {
         falsos.push_back(billete(falsos[i].numero_de_serie+200000000000));
         falsos.push_back(billete(falsos[i].numero_de_serie+300000000000));
     }
-    auto t0 = std::chrono::system_clock::now();
-    fajo res = ordenar_por_probabilidad(falsos, todos);
-    auto t1 = std::chrono::system_clock::now();
+    TIME(res = ordenar_por_probabilidad(falsos, todos), RUN_TIMES,T0);
 
     EXPECT_EQ(res.front(), billete(199981991));
     EXPECT_EQ(res[count_falsos-1].probabilidad_falso, probabilidad_max);
@@ -149,14 +148,12 @@ TEST(ordenar_billetes, test_pocos_anios_muchos_falsos) {
     EXPECT_EQ(res[res.size()/2], billete(199991991));
     EXPECT_EQ(res.back(), billete(100011991));
 
-    std::cout << "T0: " << (t1-t0).count() << std::endl;
+    std::cout << "T0: " << T0 << std::endl;
 
-    auto t2 = std::chrono::system_clock::now();
-    auto res2 = ordenar_billetes_naif(falsos, todos);
-    auto t3 = std::chrono::system_clock::now();
+    TIME(res2 = ordenar_billetes_naif(falsos, todos), RUN_TIMES ,T1);
+    std::cout << "T1: " << T1 << std::endl;
 
-    std::cout << "T1: " << (t3-t2).count() << std::endl;
-    auto d = double((t1-t0).count()) / (t3-t2).count();
+    auto d = double(T0)/T1;
     std::cout << "T0/T1: " << d << std::endl;
 
     EXPECT_EQ(res, res2);
@@ -165,6 +162,8 @@ TEST(ordenar_billetes, test_pocos_anios_muchos_falsos) {
 
 TEST(ordenar_billetes, test_muchos_anios_pocos_falsos) {
     fajo todos, falsos;
+    fajo res, res2;
+    size_t T0, T1;
     todos.reserve(2015000);
     int count_falsos = 0;
 
@@ -183,9 +182,7 @@ TEST(ordenar_billetes, test_muchos_anios_pocos_falsos) {
             }
         }
     }
-    auto t0 = std::chrono::system_clock::now();
-    fajo res = ordenar_por_probabilidad(falsos, todos);
-    auto t1 = std::chrono::system_clock::now();
+    TIME(res = ordenar_por_probabilidad(falsos, todos), RUN_TIMES,T0);
 
     EXPECT_EQ(res.front(), billete(11012016));
     EXPECT_EQ(res[count_falsos-1].probabilidad_falso, probabilidad_max);
@@ -193,16 +190,15 @@ TEST(ordenar_billetes, test_muchos_anios_pocos_falsos) {
     EXPECT_EQ(res[res.size()/2], billete(15002016));
     EXPECT_EQ(res.back(), billete(10000001));
 
-    std::cout << "T0: " << (t1-t0).count() << std::endl;
+    std::cout << "T0: " << T0 << std::endl;
 
-    auto t2 = std::chrono::system_clock::now();
-    auto res2 = ordenar_billetes_naif(falsos, todos);
-    auto t3 = std::chrono::system_clock::now();
+    TIME(res2 = ordenar_billetes_naif(falsos, todos), RUN_TIMES ,T1);
+    std::cout << "T1: " << T1 << std::endl;
 
-    std::cout << "T1: " << (t3-t2).count() << std::endl;
-    auto d = double((t1-t0).count()) / (t3-t2).count();
+    auto d = double(T0)/T1;
     std::cout << "T0/T1: " << d << std::endl;
 
     EXPECT_EQ(res, res2);
     EXPECT_LE(d, 0.25);
 }
+#endif // TEST_TIMING

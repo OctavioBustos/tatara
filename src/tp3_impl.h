@@ -73,10 +73,8 @@ fajo ordenar_por_probabilidad(const fajo& falsos_conocidos, const fajo & a_orden
     // CONSULTO EL PRIMER AÑO (PRIMER BUCKET) PARA PODER INDEXAR BIEN LA BÚSQUEDA EN falsos.
 	int primerAnioEnVector = int(*falsos[0].begin());
 
-    // fajoConProbActualizadas VA A GUARDAR (EN FORMA ORDENADA POR SER UN SET) UNA COPIA DE  a_ordenar 
-    // CON LAS PROBABILIDADES DE TODOS LOS BILLETES ACTUALIZADA.
-	std::set<billete> fajoConProbActualizadas;
-
+    fajo res;
+    res.reserve(a_ordenar.size());
 
     for (auto & b : a_ordenar){
 
@@ -94,18 +92,13 @@ fajo ordenar_por_probabilidad(const fajo& falsos_conocidos, const fajo & a_orden
     			probabilidadBillete = falsos[indiceEnVectorFalsos].size(); 
     		}
 
-		fajoConProbActualizadas.insert(billete(b.numero_de_serie, probabilidadBillete));
+        res.emplace_back(b.numero_de_serie, probabilidadBillete);
     }
 
-    fajo resultado;
-    resultado.reserve(a_ordenar.size());
+    sort(res.begin(), res.end());
+    reverse(res.begin(), res.end());
+    return res;
 
-    // ITERO SOBRE fajoConProbActualizadas PARA CREAR EL VECTOR A DEVOLVER.
-	for (auto it=fajoConProbActualizadas.rbegin(); it!=fajoConProbActualizadas.rend(); ++it){
-		resultado.push_back(*it);
-	}
-
-    return resultado;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

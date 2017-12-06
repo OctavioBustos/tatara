@@ -110,109 +110,91 @@ fajo ordenar_por_probabilidad(const fajo& falsos_conocidos, const fajo & a_orden
 /// EJERCICIO 3
 ////
 
-inline void sumarMatrices(Matriz& A, Matriz& B, Matriz& C, int size) {
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            C[i][j] = A[i][j] + B[i][j];
-        }
-    }
-}
-
-inline void restarMatrices(Matriz& A, Matriz& B, Matriz& C, int size) {
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            C[i][j] = A[i][j] - B[i][j];
-        }
-    }   
-}
-
-inline void strassen(Matriz& A, Matriz& B, Matriz& C, int K) {
+inline void strassen(Matriz& A, Matriz& B, Matriz& C, unsigned long K) {
     if(A.size() <= K){
-		C =  multiplicar(A,B);
+		C = multiplicar(A,B);
 		return;
     }else{
-        int midSize = A.size()/2;
+        unsigned long midSize = A.size()/2;
         vector<double> aux (midSize);
-		Matriz	a11(midSize,aux),
-				a12(midSize,aux),
-				a21(midSize,aux),
-				a22(midSize,aux),
-				b11(midSize,aux),
-				b12(midSize,aux),
-				b21(midSize,aux),
-				b22(midSize,aux),
-				c11(midSize,aux),
-				c12(midSize,aux),
-				c21(midSize,aux),
-				c22(midSize,aux),
-				m1(midSize,aux),
-				m2(midSize,aux),
-				m3(midSize,aux),
-				m4(midSize,aux),
-				m5(midSize,aux),
-				m6(midSize,aux),
-				m7(midSize,aux),
-				aRes(midSize,aux),
-				bRes(midSize,aux);
+		Matriz	A11(midSize,aux),
+				A22(midSize,aux),
+				B11(midSize,aux),
+				B22(midSize,aux),
+
+				M1(midSize,aux),
+				M2(midSize,aux),
+				M3(midSize,aux),
+				M4(midSize,aux),
+				M5(midSize,aux),
+				M6(midSize,aux),
+				M7(midSize,aux),
+
+                A1122(midSize,aux),
+                B1122(midSize, aux),
+                A2122(midSize, aux),
+                B12_22(midSize, aux),
+                B21_11(midSize, aux),
+                A1112(midSize, aux),
+                A21_11(midSize, aux),
+                B1112(midSize, aux),
+                A12_22(midSize, aux),
+                B2122(midSize, aux)
+        ;
  
         for (int i = 0; i < midSize; i++) {
             for (int j = 0; j < midSize; j++) {
-                a11[i][j] = A[i][j];
-                a12[i][j] = A[i][j + midSize];
-                a21[i][j] = A[i + midSize][j];
-                a22[i][j] = A[i + midSize][j + midSize];
- 
-                b11[i][j] = B[i][j];
-                b12[i][j] = B[i][j + midSize];
-                b21[i][j] = B[i + midSize][j];
-                b22[i][j] = B[i + midSize][j + midSize];
+
+                double a11 = A[i][j];
+                double a12 = A[i][j + midSize];
+                double a21 = A[i + midSize][j];
+                double a22 = A[i + midSize][j + midSize];
+
+                double b11 = B[i][j];
+                double b12 = B[i][j + midSize];
+                double b21 = B[i + midSize][j];
+                double b22 = B[i + midSize][j + midSize];
+
+                A11[i][j] = a11;
+                A22[i][j] = a22;
+                B11[i][j] = b11;
+                B22[i][j] = b22;
+                A1122[i][j] = a11 + a22;
+                B1122[i][j] = b11 + b22;
+                A2122[i][j] = a21 + a22;
+                B12_22[i][j] = b12 - b22;
+                B21_11[i][j] = b12 - b11;
+                A1112[i][j] = a11 + a12;
+                A21_11[i][j] = a21 - a11;
+                B1112[i][j] = b11 + b12;
+                A12_22[i][j] = a12 - a22;
+                B2122[i][j] = b21 + b22;
+
             }
         }
- 
-        sumarMatrices(a11, a22, aRes, midSize);
-        sumarMatrices(b11, b22, bRes, midSize);
-        strassen(aRes, bRes, m1, midSize);
-        sumarMatrices(a21, a22, aRes, midSize);
-        strassen(aRes, b11, m2, midSize);
-        restarMatrices(b12, b22, bRes, midSize);
-        strassen(a11, bRes, m3, midSize);
-        restarMatrices(b21, b11, bRes, midSize);
-        strassen(a22, bRes, m4, midSize);
-        sumarMatrices(a11, a12, aRes, midSize);
-        strassen(aRes, b22, m5, midSize);
-        restarMatrices(a21, a11, aRes, midSize);
-        sumarMatrices(b11, b12, bRes, midSize);
-        strassen(aRes, bRes, m6, midSize);
-        restarMatrices(a12, a22, aRes, midSize);
-        sumarMatrices(b21, b22, bRes, midSize);
-        strassen(aRes, bRes, m7, midSize);
-        sumarMatrices(m3, m5, c12, midSize);
-        sumarMatrices(m2, m4, c21, midSize);
-        sumarMatrices(m1, m4, aRes, midSize);
-        sumarMatrices(aRes, m7, bRes, midSize);
-        restarMatrices(bRes, m5, c11, midSize);
-        sumarMatrices(m1, m3, aRes, midSize);
-        sumarMatrices(aRes, m6, bRes, midSize);
-        restarMatrices(bRes, m2, c22, midSize);
 
+        strassen(A1122, B1122, M1, midSize);
+        strassen(A2122, B11, M2, midSize);
+        strassen(A11, B12_22, M3, midSize);
+        strassen(A22, B21_11, M4, midSize);
+        strassen(A1112, B22, M5, midSize);
+        strassen(A21_11, B1112, M6, midSize);
+        strassen(A12_22, B2122, M7, midSize);
 
         for (int i = 0; i < midSize ; i++) {
-
             for (int j = 0 ; j < midSize ; j++) {
-                C[i][j] = c11[i][j];
-                C[i][j + midSize] = c12[i][j];
-                C[i + midSize][j] = c21[i][j];
-                C[i + midSize][j + midSize] = c22[i][j];
+                C[i][j] = M1[i][j] + M4[i][j] - M5[i][j] + M7[i][j];
+                C[i][j + midSize] = M3[i][j] + M5[i][j];
+                C[i + midSize][j] = M2[i][j] + M4[i][j];
+                C[i + midSize][j + midSize] = M1[i][j] - M2[i][j] + M3[i][j] + M6[i][j];
             }
-
         }
-
 
     }
 }
 
 inline Matriz multiplicar_strassen(Matriz& A, Matriz& B, int K) {
-    unsigned int n = A.size();
+    unsigned long n = A.size();
 
     Matriz C(n, vector<double>(n)); 
     strassen(A,B,C,K);

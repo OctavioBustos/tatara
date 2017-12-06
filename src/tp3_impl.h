@@ -126,9 +126,18 @@ inline void restarMatrices(Matriz& A, Matriz& B, Matriz& C, int size) {
     }   
 }
 
+
+inline void multiplicarMatrices(Matriz& A, Matriz& B, Matriz& C) {
+    for (size_t i=0; i < A.size(); ++i)
+        for (size_t j=0; j < A.size(); ++j)
+            for (size_t k=0; k < B.size(); ++k)
+                C[i][j] += A[i][k] * B[k][j];
+}
+
+
 inline void strassen(Matriz& A, Matriz& B, Matriz& C, int K) {
     if(A.size() <= K){
-		C =  multiplicar(A,B);
+		 multiplicarMatrices(A,B,C);
 		return;
     }else{
         int midSize = A.size()/2;

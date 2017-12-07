@@ -120,7 +120,7 @@ inline void multiplicarMatrices(Matriz& A, Matriz& B, Matriz& C) {
 
 inline void strassen(Matriz& A, Matriz& B, Matriz& C, unsigned long K) {
     if(A.size() <= K){
-		C = multiplicar(A,B);
+		multiplicarMatrices(A,B,C);
 		return;
     }else{
         unsigned long midSize = A.size()/2;

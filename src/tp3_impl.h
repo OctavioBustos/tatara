@@ -110,6 +110,14 @@ fajo ordenar_por_probabilidad(const fajo& falsos_conocidos, const fajo & a_orden
 /// EJERCICIO 3
 ////
 
+inline void multiplicarMatrices(Matriz& A, Matriz& B, Matriz& C) {
+	for (size_t i=0; i < A.size(); ++i)
+		for (size_t j=0; j < A.size(); ++j)
+			for (size_t k=0; k < B.size(); ++k)
+				C[i][j] += A[i][k] * B[k][j];
+}
+
+
 inline void strassen(Matriz& A, Matriz& B, Matriz& C, unsigned long K) {
     if(A.size() <= K){
 		C = multiplicar(A,B);
@@ -173,13 +181,13 @@ inline void strassen(Matriz& A, Matriz& B, Matriz& C, unsigned long K) {
             }
         }
 
-        strassen(A1122, B1122, M1, midSize);
-        strassen(A2122, B11, M2, midSize);
-        strassen(A11, B12_22, M3, midSize);
-        strassen(A22, B21_11, M4, midSize);
-        strassen(A1112, B22, M5, midSize);
-        strassen(A21_11, B1112, M6, midSize);
-        strassen(A12_22, B2122, M7, midSize);
+        strassen(A1122, B1122, M1, K);
+        strassen(A2122, B11, M2, K);
+        strassen(A11, B12_22, M3, K);
+        strassen(A22, B21_11, M4, K);
+        strassen(A1112, B22, M5, K);
+        strassen(A21_11, B1112, M6, K);
+        strassen(A12_22, B2122, M7, K);
 
         for (int i = 0; i < midSize ; i++) {
             for (int j = 0 ; j < midSize ; j++) {
